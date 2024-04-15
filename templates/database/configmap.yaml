@@ -1,0 +1,10 @@
+# templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  MYSQL_DATABASE: {{ .Values.mysql.config.MYSQL_DATABASE }}
+  MYSQL_USER: {{ .Values.mysql.config.MYSQL_USER }}
+  MYSQL_PASSWORD: {{ .Values.mysql.config.MYSQL_PASSWORD }}
+  MYSQL_ROOT_PASSWORD: {{ .Values.mysql.config.MYSQL_ROOT_PASSWORD }}

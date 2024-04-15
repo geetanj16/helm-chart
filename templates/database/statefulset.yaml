@@ -1,0 +1,44 @@
+# templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-mysql
+spec:
+  serviceName: {{ .Values.mysql.serviceName }}
+  replicas: {{ .Values.mysql.replicas }}
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+#      initContainers:
+#      - name: delay
+#        image: busybox
+#        command: ["sh", "-c", "sleep 20"]  # Sleep for 20 seconds
+      containers:
+      - name: mysql
+        image: {{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - configMapRef:
+            name: mysql-config
+        volumeMounts:
+        - name: {{ .Values.mysql.volume.name }}
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: {{ .Values.mysql.volume.name }}
+        persistentVolumeClaim:
+          claimName: {{ .Values.mysql.volume.persistentVolumeClaim.claimName }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: alpha.eksctl.io/nodegroup-name
+                operator: In
+                values:
+                - {{ .Values.mysql.affinity.nodegroup }}

@@ -1,0 +1,58 @@
+frontend:
+  image:
+    repository: "566469845369.dkr.ecr.us-west-2.amazonaws.com/chatapp"
+    tag: "frontend"
+  service:
+    name: "mychatapp-frontend"
+    type: "NodePort"
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
+  nodeAffinity:
+    nodegroup: "medium"
+
+
+
+ingress:
+  name: "frontend-ingress"
+  serviceName: "mychatapp-frontend"
+  servicePort: 80
+
+
+# values.yaml
+
+backend:
+  image:
+    repository: "566469845369.dkr.ecr.us-west-2.amazonaws.com/chatapp"
+    tag: "backend"
+  replicas: 1
+  affinity:
+    nodegroup: "medium"
+  config:
+    DB_NAME: "chatapp"
+    DB_USER: "geetanj"
+    DB_PASSWORD: "kali"
+    DB_HOST: "mysql"
+
+# values.yaml
+mysql:
+  image:
+    repository: "566469845369.dkr.ecr.us-west-2.amazonaws.com/chatapp"
+    tag: "database"
+  serviceName: "mysql"
+  replicas: 1
+  config:
+    MYSQL_DATABASE: "chatapp"
+    MYSQL_USER: "geetanj"
+    MYSQL_PASSWORD: "kali"
+    MYSQL_ROOT_PASSWORD: "kali"
+  volume:
+    name: "db"
+    persistentVolumeClaim:
+      claimName: "db-mysql-0"
+  affinity:
+    nodegroup: "small"
